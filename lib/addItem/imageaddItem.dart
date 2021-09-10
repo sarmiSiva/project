@@ -217,7 +217,7 @@ class _UploadingImageToFirebaseStorageState
     Reference firebaseStorageRef =
         FirebaseStorage.instance.ref().child('uploads/$fileName');
     UploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
-    TaskSnapshot taskSnapshot = await uploadTask.onComplete;
+    TaskSnapshot taskSnapshot = await uploadTask;//!i have chenged .onComplete
     taskSnapshot.ref.getDownloadURL().then(
           (value) => print("Done: $value"),
         );
@@ -267,7 +267,7 @@ class _UploadingImageToFirebaseStorageState
                           borderRadius: BorderRadius.circular(30.0),
                           child: _imageFile != null
                               ? Image.file(_imageFile)
-                              : FlatButton(
+                              : TextButton(
                                   child: Icon(
                                     Icons.add_a_photo,
                                     size: 50,
