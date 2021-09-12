@@ -207,6 +207,7 @@ import 'package:flutter/material.dart';
 import 'package:project_s/addItem/form_screen.dart';
 import 'package:project_s/chat/chatmain.dart';
 import 'package:project_s/constants.dart';
+import 'package:project_s/imgclass/imgClassMyHomePage.dart';
 import 'package:project_s/page/contactus.dart';
 import 'package:project_s/page/details.dart';
 
@@ -221,6 +222,8 @@ class _indexAppState extends State<indexApp> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User user;
   bool isloggedin = false;
+  String userName = '';
+  String userEmail = '';
 
   checkAuthentification() async {
     _auth.authStateChanges().listen((user) {
@@ -240,6 +243,8 @@ class _indexAppState extends State<indexApp> {
         this.user = firebaseUser;
         this.isloggedin = true;
       });
+      userName = user.displayName;
+      userEmail = user.email;
     }
   }
 
@@ -261,6 +266,7 @@ class _indexAppState extends State<indexApp> {
   Widget build(BuildContext context) => DefaultTabController(
         length: 2,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: new AppBar(
             /*
         leading: IconButton(
@@ -302,16 +308,18 @@ class _indexAppState extends State<indexApp> {
               ),
             ],
           ),
-          body: Container(
-            child: !isloggedin
-                ? CircularProgressIndicator()
-                : TabBarView(
-                    children: [
-                      FormScreen(),
-                      //imgClassMyHomePage(),
-                      Center(child: Text('Tab1')),
-                    ],
-                  ),
+          body: Center(
+            child: Container(
+              child: !isloggedin
+                  ? CircularProgressIndicator()
+                  : TabBarView(
+                      children: [
+                        FormScreen(),
+                        //imgClassMyHomePage(),
+                        Center(child: Text('Tab1')),
+                      ],
+                    ),
+            ),
           ),
           floatingActionButton: FloatingActionButton(
               child: Icon(
@@ -330,8 +338,8 @@ class _indexAppState extends State<indexApp> {
             child: Column(
               children: <Widget>[
                 UserAccountsDrawerHeader(
-                  accountName: Text('${user.displayName}'),
-                  accountEmail: Text('${user.email}'),
+                  accountName: Text(userName),
+                  accountEmail: Text(userEmail),
                   currentAccountPicture: CircleAvatar(
                     backgroundColor: Colors.white,
                     child: Text('xyz'),
@@ -350,7 +358,12 @@ class _indexAppState extends State<indexApp> {
                 ListTile(
                   title: Text('Profile'),
                   leading: Icon(Icons.people),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => details()),
+                    );
+                  },
                 ),
                 Divider(
                   height: 0.2,
@@ -359,7 +372,10 @@ class _indexAppState extends State<indexApp> {
                   title: Text('About & Contect us'),
                   leading: Icon(Icons.contact_page),
                   onTap: () {
-                    contactus();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => contactus()),
+                    );
                   },
                 ),
                 Divider(
@@ -385,6 +401,20 @@ class _indexAppState extends State<indexApp> {
                 ListTile(
                   title: Text('LogOut'),
                   leading: Icon(Icons.logout_sharp),
+                ),
+                Divider(
+                  height: 0.2,
+                ),
+                ListTile(
+                  title: Text('Image'),
+                  leading: Icon(Icons.image_aspect_ratio_sharp),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => imgClassMyHomePage()),
+                    );
+                  },
                 ),
                 Divider(
                   height: 0.2,

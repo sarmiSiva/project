@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 // import 'package:authentification/Start.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:project_s/constants.dart';
-import 'package:project_s/imgclass/ImageDetect.dart';
+import 'package:project_s/imgclass/imgClassMyHomePage.dart';
+// import 'package:project_s/imgclass/ImageDetect.dart';
 //import 'package:project_s/imgclass/img.dart';
 import 'package:project_s/main/indexApp.dart';
 import 'Start.dart';
@@ -104,17 +105,17 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold)),
-                  color: Colors.pink,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
+                  // color: Colors.pink,
+                  // shape: RoundedRectangleBorder(
+                  //   borderRadius: BorderRadius.circular(20.0),
+                  // ),
                 ),
-                RaisedButton(
-                  padding: EdgeInsets.fromLTRB(70, 10, 70, 10),
+                ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => DetectMain()),
+                      MaterialPageRoute(builder: (context) => imgClassMyHomePage()),
+                      
                     );
                   },
                   child: Text('imgPick',
@@ -122,10 +123,10 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold)),
-                  color: Colors.pink,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
+                  // color: Colors.pink,
+                  // shape: RoundedRectangleBorder(
+                  //   borderRadius: BorderRadius.circular(20.0),
+                  // ),
                 )
               ],
             ),
