@@ -1,8 +1,13 @@
+// import 'dart:html';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_s/addItem/AddItemdb.dart';
-import 'package:project_s/imgclass/imgClassMyHomePage.dart';
+// import 'package:project_s/imgclass/imgClassMyHomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tflite/tflite.dart';
 
 class FormScreen extends StatefulWidget {
   @override
@@ -15,6 +20,8 @@ class FormScreenState extends State<FormScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User user;
   bool isloggedin = false;
+  List _classifiedResult;
+  File _imageFile;
 
   checkAuthentification() async {
     _auth.authStateChanges().listen((user) {
@@ -42,6 +49,51 @@ class FormScreenState extends State<FormScreen> {
     super.initState();
     this.checkAuthentification();
     this.getUser();
+    loadImageModel();
+  }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
+
+  Future loadImageModel() async {
+    Tflite.close();
+    String result;
+    result = await Tflite.loadModel(
+      model: "assets/catdog_model.tflite",
+      labels: "assets/cat_dog_labels.txt",
+    );
+    print(result);
+  }
+
+  Future selectImage() async {
+    final picker = ImagePicker();
+    var image =
+        await picker.getImage(source: ImageSource.gallery, maxHeight: 300);
+    classifyImage(image);
+  }
+
+  Future classifyImage(image) async {
+    _classifiedResult = null;
+    // Run tensorflowlite image classification model on the image
+    print("classification start $image");
+    final List result = await Tflite.runModelOnImage(
+      path: image.path,
+      numResults: 6,
+      threshold: 0.05,
+      imageMean: 127.5,
+      imageStd: 127.5,
+    );
+    print("classification done");
+    setState(() {
+      if (image != null) {
+        _imageFile = File(image.path);
+        _classifiedResult = result;
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 
   String _itemname;
@@ -251,101 +303,155 @@ class FormScreenState extends State<FormScreen> {
           //margin: EdgeInsets.only(8.0, 8.0, 8.0, 0.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _additem(),
-                _addDescribe(),
-                _buildQuantity(),
-                _buildName(),
-                _addAddress(),
-                _buildPhoneNumber(),
-                //_buildEmail(),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    RaisedButton(
-                      padding: EdgeInsets.only(left: 30, right: 30),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.all(15),
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(15),
+                        ),
+                        border: Border.all(color: Colors.white),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            offset: Offset(2, 2),
+                            spreadRadius: 2,
+                            blurRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: (_imageFile != null)
+                          ? Image.file(_imageFile)
+                          : Image.network('https://i.imgur.com/sUFH1Aq.png')),
+                  RaisedButton(
                       onPressed: () {
-                        if (!_formKey.currentState.validate()) {
-                          return;
-                        }
-                        AddItem(_itemname, _name, _phoneNumber, _quantity,
-                            _describe, _address);
-                        /*String _itemname;
-                          String _name;
-                          String _phoneNumber;
-                          String _quantity;
-                          String _address;
-                          String _describe;*/
+                        selectImage();
                       },
-                      child: Text(
-                        'Send',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      color: Colors.green,
+                      child: Icon(Icons.camera)),
+                  SizedBox(height: 20),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: _classifiedResult != null
+                          ? _classifiedResult.map((result) {
+                              return Card(
+                                elevation: 0.0,
+                                color: Colors.lightBlue,
+                                child: Container(
+                                  width: 300,
+                                  margin: EdgeInsets.all(10),
+                                  child: Center(
+                                    child: Text(
+                                      "${result["label"]} :  ${(result["confidence"] * 100).toStringAsFixed(1)}%",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList()
+                          : [],
                     ),
-                    SizedBox(width: 20.0),
-                    RaisedButton(
-                      padding: EdgeInsets.only(left: 30, right: 30),
-                      onPressed: () {},
-                      child: Text(
-                        'Clear',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      color: Colors.blueGrey,
-                    ),
-                  ],
-                ),
-
-                /*Center(
-                  child: Row(
-                    children: [
+                  ),
+                  _additem(),
+                  _addDescribe(),
+                  _buildQuantity(),
+                  _buildName(),
+                  _addAddress(),
+                  _buildPhoneNumber(),
+                  //_buildEmail(),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
                       RaisedButton(
-                        child: Text(
-                          'Send',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        color: Colors.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        padding: EdgeInsets.only(left: 30, right: 30),
                         onPressed: () {
                           if (!_formKey.currentState.validate()) {
                             return;
                           }
+                          AddItem(_itemname, _name, _phoneNumber, _quantity,
+                              _describe, _address);
+                          /*String _itemname;
+                            String _name;
+                            String _phoneNumber;
+                            String _quantity;
+                            String _address;
+                            String _describe;*/
                         },
+                        child: Text(
+                          'Send',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        color: Colors.green,
                       ),
+                      SizedBox(width: 20.0),
                       RaisedButton(
+                        padding: EdgeInsets.only(left: 30, right: 30),
+                        onPressed: () {},
                         child: Text(
                           'Clear',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                        color: Colors.red,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        onPressed: () {},
-                      )
+                        color: Colors.blueGrey,
+                      ),
                     ],
                   ),
-                )*/
-              ],
+
+                  /*Center(
+                    child: Row(
+                      children: [
+                        RaisedButton(
+                          child: Text(
+                            'Send',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                          color: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          onPressed: () {
+                            if (!_formKey.currentState.validate()) {
+                              return;
+                            }
+                          },
+                        ),
+                        RaisedButton(
+                          child: Text(
+                            'Clear',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                          color: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          onPressed: () {},
+                        )
+                      ],
+                    ),
+                  )*/
+                ],
+              ),
             ),
           ),
         ),
