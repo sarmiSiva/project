@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // import 'package:authentification/Start.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:project_s/constants.dart';
-import 'package:project_s/imgclass/ImageDetect.dart';
+//import 'package:project_s/imgclass/ImageDetect.dart';
 //import 'package:project_s/imgclass/img.dart';
 import 'package:project_s/main/indexApp.dart';
 import 'Start.dart';
@@ -112,10 +112,11 @@ class _HomePageState extends State<HomePage> {
                 RaisedButton(
                   padding: EdgeInsets.fromLTRB(70, 10, 70, 10),
                   onPressed: () {
+                    /*
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => DetectMain()),
-                    );
+                    );*/
                   },
                   child: Text('imgPick',
                       style: TextStyle(

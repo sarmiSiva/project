@@ -3,6 +3,7 @@ import 'package:project_s/addItem/AddItemdb.dart';
 import 'package:project_s/imgclass/imgClassMyHomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:project_s/mlKit/mlmain.dart';
 
 class FormScreen extends StatefulWidget {
   @override
@@ -75,21 +76,25 @@ class FormScreenState extends State<FormScreen> {
   }
 
   Widget _addDescribe() {
-    return TextFormField(
-      decoration: InputDecoration(
-          labelText: 'Describe about item',
-          hintText: 'Enter you item Describe'),
-      //maxLength: 10,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return 'Item Describe is Required';
-        }
+    return Container(
+      child: TextFormField(
+        decoration: InputDecoration(
+            labelText: 'Describe about item',
+            hintText: 'Enter you item Describe'),
+        //maxLength: 10,
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Item Describe is Required';
+          }
 
-        return null;
-      },
-      onSaved: (String value) {
-        _describe = value;
-      },
+          return null;
+        },
+        onSaved: (String value) {
+          _describe = value;
+        },
+      ),
+      /*IconButton(onPressed: () {mlmain();}, Icon(Icons.live_help),
+        IconButton(onPressed: () {}, Icon(Icons.paste)),*/
     );
   }
 
@@ -296,7 +301,9 @@ class FormScreenState extends State<FormScreen> {
                     SizedBox(width: 20.0),
                     RaisedButton(
                       padding: EdgeInsets.only(left: 30, right: 30),
-                      onPressed: () {},
+                      onPressed: () {
+                        mlmain();
+                      },
                       child: Text(
                         'Clear',
                         style: TextStyle(
