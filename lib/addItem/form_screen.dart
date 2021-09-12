@@ -8,6 +8,7 @@ import 'package:project_s/addItem/AddItemdb.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tflite/tflite.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FormScreen extends StatefulWidget {
   @override
@@ -22,6 +23,7 @@ class FormScreenState extends State<FormScreen> {
   bool isloggedin = false;
   List _classifiedResult;
   File _imageFile;
+  String userName = '';
 
   checkAuthentification() async {
     _auth.authStateChanges().listen((user) {
@@ -41,6 +43,7 @@ class FormScreenState extends State<FormScreen> {
         this.user = firebaseUser;
         this.isloggedin = true;
       });
+      userName = user.displayName;
     }
   }
 
@@ -80,7 +83,7 @@ class FormScreenState extends State<FormScreen> {
     print("classification start $image");
     final List result = await Tflite.runModelOnImage(
       path: image.path,
-      numResults: 6,
+      numResults: 1,
       threshold: 0.05,
       imageMean: 127.5,
       imageStd: 127.5,
@@ -94,6 +97,23 @@ class FormScreenState extends State<FormScreen> {
         print('No image selected.');
       }
     });
+  }
+
+  CollectionReference item = FirebaseFirestore.instance.collection('item');
+
+  Future<void> addItem() {
+    // Call the user's CollectionReference to add a new user
+    return item
+        .add({
+          'itemname': _itemname,
+          'username': _name,
+          'phoneNumber': _phoneNumber,
+          'quantity': _quantity,
+          'address': _address,
+          'itemdescribe': _describe,
+        })
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user: $error"));
   }
 
   String _itemname;
@@ -117,7 +137,6 @@ class FormScreenState extends State<FormScreen> {
         if (value.isEmpty) {
           return 'Item Name is Required';
         }
-
         return null;
       },
       onSaved: (String value) {
@@ -129,8 +148,15 @@ class FormScreenState extends State<FormScreen> {
   Widget _addDescribe() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'Describe about item',
-          hintText: 'Enter you item Describe'),
+        labelText: 'Describe about item',
+        hintText: 'Enter you item Describe',
+        suffixIcon: IconButton(
+          onPressed: () async {
+            await selectImage();
+          },
+          icon: Icon(Icons.camera),
+        ),
+      ),
       //maxLength: 10,
       validator: (String value) {
         if (value.isEmpty) {
@@ -157,8 +183,9 @@ class FormScreenState extends State<FormScreen> {
 
         return null;
       },
+      initialValue: userName,
       onSaved: (String value) {
-        _name = value;
+        _name = userName;
       },
     );
   }
@@ -328,11 +355,11 @@ class FormScreenState extends State<FormScreen> {
                       child: (_imageFile != null)
                           ? Image.file(_imageFile)
                           : Image.network('https://i.imgur.com/sUFH1Aq.png')),
-                  RaisedButton(
-                      onPressed: () {
-                        selectImage();
-                      },
-                      child: Icon(Icons.camera)),
+                  // RaisedButton(
+                  //     onPressed: () {
+                  //       selectImage();
+                  //     },
+                  //     child: Icon(Icons.camera)),
                   SizedBox(height: 20),
                   SingleChildScrollView(
                     child: Column(
@@ -376,8 +403,11 @@ class FormScreenState extends State<FormScreen> {
                           if (!_formKey.currentState.validate()) {
                             return;
                           }
-                          AddItem(_itemname, _name, _phoneNumber, _quantity,
-                              _describe, _address);
+
+                          addItem();
+
+                          // AddItem(_itemname, _name, _phoneNumber, _quantity,
+                          //     _address, _describe);
                           /*String _itemname;
                             String _name;
                             String _phoneNumber;

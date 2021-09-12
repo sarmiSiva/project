@@ -17,6 +17,7 @@ class AddItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // Create a CollectionReference called item that references the firestore collection
     CollectionReference item = FirebaseFirestore.instance.collection('item');
+    print("adding items");
 
     Future<void> addItem() {
       // Call the user's CollectionReference to add a new user
@@ -32,5 +33,7 @@ class AddItem extends StatelessWidget {
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
     }
+
+    print("saved instance");
   }
 }

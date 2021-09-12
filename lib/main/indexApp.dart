@@ -266,6 +266,7 @@ class _indexAppState extends State<indexApp> {
   Widget build(BuildContext context) => DefaultTabController(
         length: 2,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: new AppBar(
             /*
         leading: IconButton(
@@ -357,7 +358,12 @@ class _indexAppState extends State<indexApp> {
                 ListTile(
                   title: Text('Profile'),
                   leading: Icon(Icons.people),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => details()),
+                    );
+                  },
                 ),
                 Divider(
                   height: 0.2,
@@ -366,7 +372,10 @@ class _indexAppState extends State<indexApp> {
                   title: Text('About & Contect us'),
                   leading: Icon(Icons.contact_page),
                   onTap: () {
-                    contactus();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => contactus()),
+                    );
                   },
                 ),
                 Divider(
