@@ -307,16 +307,18 @@ class _indexAppState extends State<indexApp> {
               ),
             ],
           ),
-          body: Container(
-            child: !isloggedin
-                ? CircularProgressIndicator()
-                : TabBarView(
-                    children: [
-                      FormScreen(),
-                      //imgClassMyHomePage(),
-                      Center(child: Text('Tab1')),
-                    ],
-                  ),
+          body: Center(
+            child: Container(
+              child: !isloggedin
+                  ? CircularProgressIndicator()
+                  : TabBarView(
+                      children: [
+                        FormScreen(),
+                        //imgClassMyHomePage(),
+                        Center(child: Text('Tab1')),
+                      ],
+                    ),
+            ),
           ),
           floatingActionButton: FloatingActionButton(
               child: Icon(
