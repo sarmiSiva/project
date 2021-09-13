@@ -24,6 +24,22 @@ class FormScreenState extends State<FormScreen> {
   List _classifiedResult;
   File _imageFile;
   String userName = '';
+  String _itemname;
+  String _name;
+  //String _email;
+  //String _password;
+  //String _url;
+  String _phoneNumber;
+  String _quantity;
+  String _address;
+  String _describe;
+
+  final itemController = TextEditingController();
+  final NameController = TextEditingController();
+  final quaController = TextEditingController();
+  final addController = TextEditingController();
+  final desController = TextEditingController();
+  final phoneController = TextEditingController();
 
   checkAuthentification() async {
     _auth.authStateChanges().listen((user) {
@@ -103,33 +119,33 @@ class FormScreenState extends State<FormScreen> {
 
   Future<void> addItem() {
     // Call the user's CollectionReference to add a new user
-    return item
-        .add({
-          'itemname': _itemname,
-          'username': _name,
-          'phoneNumber': _phoneNumber,
-          'quantity': _quantity,
-          'address': _address,
-          'itemdescribe': _describe,
-        })
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user: $error"));
+    return item.add({
+      'itemname': itemController.text,
+      'username': NameController.text,
+      'phoneNumber': phoneController.text,
+      'quantity': quaController.text,
+      'address': addController.text,
+      'itemdescribe': desController.text,
+    }).then((value) {
+      print("User Added");
+      clearText();
+    }).catchError((error) => print("Failed to add user: $error"));
   }
 
-  String _itemname;
-  String _name;
-  //String _email;
-  //String _password;
-  //String _url;
-  String _phoneNumber;
-  String _quantity;
-  String _address;
-  String _describe;
+  void clearText() {
+    itemController.clear();
+    NameController.clear();
+    phoneController.clear();
+    quaController.clear();
+    addController.clear();
+    desController.clear();
+  }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Widget _additem() {
     return TextFormField(
+      controller: itemController,
       decoration:
           InputDecoration(labelText: 'Name', hintText: 'Enter you Name'),
       //maxLength: 10,
@@ -147,15 +163,16 @@ class FormScreenState extends State<FormScreen> {
 
   Widget _addDescribe() {
     return TextFormField(
+      controller: desController,
       decoration: InputDecoration(
         labelText: 'Describe about item',
         hintText: 'Enter you item Describe',
-        suffixIcon: IconButton(
-          onPressed: () async {
-            await selectImage();
-          },
-          icon: Icon(Icons.camera),
-        ),
+        // suffixIcon: IconButton(
+        //   onPressed: () async {
+        //     await selectImage();
+        //   },
+        //   icon: Icon(Icons.camera),
+        // ),
       ),
       //maxLength: 10,
       validator: (String value) {
@@ -173,6 +190,7 @@ class FormScreenState extends State<FormScreen> {
 
   Widget _buildName() {
     return TextFormField(
+      controller: NameController,
       decoration:
           InputDecoration(labelText: 'Your Name', hintText: 'Enter you Name'),
       //maxLength: 10,
@@ -183,7 +201,7 @@ class FormScreenState extends State<FormScreen> {
 
         return null;
       },
-      initialValue: userName,
+      // initialValue: userName,
       onSaved: (String value) {
         _name = userName;
       },
@@ -192,6 +210,7 @@ class FormScreenState extends State<FormScreen> {
 
   Widget _buildPhoneNumber() {
     return TextFormField(
+      controller: phoneController,
       decoration: InputDecoration(labelText: 'Phone number', prefixText: '+94'),
       maxLength: 9,
       keyboardType: TextInputType.phone,
@@ -286,6 +305,7 @@ class FormScreenState extends State<FormScreen> {
 
   Widget _buildQuantity() {
     return TextFormField(
+      controller: quaController,
       decoration: InputDecoration(labelText: 'Quantity'),
       keyboardType: TextInputType.number,
       validator: (String value) {
@@ -305,6 +325,7 @@ class FormScreenState extends State<FormScreen> {
 
   Widget _addAddress() {
     return TextFormField(
+      controller: addController,
       decoration: InputDecoration(
           labelText: 'Your Address', hintText: 'Enter you address'),
       //maxLength: 10,
@@ -355,11 +376,11 @@ class FormScreenState extends State<FormScreen> {
                       child: (_imageFile != null)
                           ? Image.file(_imageFile)
                           : Image.network('https://i.imgur.com/sUFH1Aq.png')),
-                  // RaisedButton(
-                  //     onPressed: () {
-                  //       selectImage();
-                  //     },
-                  //     child: Icon(Icons.camera)),
+                  RaisedButton(
+                      onPressed: () {
+                        selectImage();
+                      },
+                      child: Icon(Icons.camera)),
                   SizedBox(height: 20),
                   SingleChildScrollView(
                     child: Column(
